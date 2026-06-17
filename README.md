@@ -92,36 +92,39 @@ Por que o deadlock não surge:
 - Isso faz com que F0 e F4 concorram pelo garfo 0. So um deles consegue, e o outro espera sem segurar nenhum recurso.
 - Sem ciclo de espera, o deadlock nao pode ocorrer.
 
-As 4 condicoes de Coffman:
+Condicao de Coffman negada:
 
-- Exclusao mutua: cada garfo so pode estar com um filosofo por vez. Isso e garantido pelo `threading.Lock()`.
-- Manter e esperar: o filosofo segura o garfo esquerdo enquanto espera o direito.
-- Nao preempcao: nenhum filosofo consegue tirar o garfo da mao de outro a forca. O garfo so e liberado com `release()`.
-- Espera circular: F0 espera F1, F1 espera F2, F2 espera F3, F3 espera F4 e F4 espera F0.
+- Espera circular: quebrada pela ordem global de aquisicao. Nao e possivel formar um ciclo em que F0 espera F1, F1 espera F2 e assim por diante, pois a ordem imposta impede que todos segurem um garfo e esperem o do vizinho ao mesmo tempo.
+- As outras tres condicoes (exclusao mutua, manter e esperar, nao preempcao) continuam presentes, mas sem a espera circular o deadlock nao pode se formar.
 
 Pseudocodigo:
 
 ```text
 para cada filosofo i:
+    esq = i
+    dir = (i + 1) mod N
+    primeiro = min(esq, dir)
+    segundo  = max(esq, dir)
+
     pensar()
     estado[i] = "com fome"
-    adquirir(garfo_esquerdo)
-    adquirir(garfo_direito)
+    adquirir(garfo[primeiro])
+    adquirir(garfo[segundo])
     estado[i] = "comendo"
     comer()
-    liberar(garfo_direito)
-    liberar(garfo_esquerdo)
+    liberar(garfo[segundo])
+    liberar(garfo[primeiro])
     estado[i] = "pensando"
 ```
 
 Print do terminal travado:
 
-![Print da Parte 1](image.png)
+![Print da Parte 1 Corrigida](parte1-filósofos/FilosofosVerCorrigida.png)
 
 Como rodar:
 
 ```powershell
-python "parte1-filósofos\FilosofosVerIngenua.py"
+python "parte1-filósofos\FilosofosVerCorrigida.py"
 ```
 ---------------------------------------------------------------------------------------------
 
