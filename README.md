@@ -148,10 +148,10 @@ python "Parte 3\versao_com_deadlock.py"
 python "Parte 3\versao_corrigida.py"
 ```
 
-[!Print do terminal da versão que ocorre deadlock](parte3/log_deadlock.png)
+![Print do terminal da versão que ocorre deadlock](parte3/log_deadlock.png)
 
 
-[!Print do Terminal da versão corrigida](parte3/log_corrigido.png)
+![Print do Terminal da versão corrigida](parte3/log_corrigido.png)
 
 
 Conclusao:
