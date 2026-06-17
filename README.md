@@ -22,11 +22,11 @@ Implementação:
 
 Por que o deadlock surge:
 
-- Porque todos os filósofos seguem a mesma ordem. Aí, por conta do time.sleep(0.05) entre os acquires, aumenta a chance disso acontecer, porque da tempo de todos pegarem o garfo esquerdo antes de qualquer um tirar o direito
+- Porque todos os filósofos seguem a mesma ordem. Aí, por conta do time.sleep(0.05) entre os acquires, aumenta a chance disso acontecer, porque da tempo de todos pegarem o garfo esquerdo antes de qualquer um tirar o direito.
 
 As 4 condições de Coffman:
 
--Exclusão mútua: Cada só pode estar na mão de um filósofo por vez. Isso é garantido pelo threading.Lock(), se um filósofo pegou, o outro fica bloqueado no acquire().
+-Exclusão mútua: Cada garfo só pode estar na mão de um filósofo por vez. Isso é garantido pelo threading.Lock(), se um filósofo pegou, o outro fica bloqueado no acquire().
 
 -Manter-e-esperar: O filósofo segura o garfo esquerdo enquanto espera o direito. Ele não larga o que já tem para tentar depois, fica travado segurando um e esperando o outro.
 
@@ -34,7 +34,27 @@ As 4 condições de Coffman:
 
 -Espera circular: F0 espera F1, F1 espera F2, F2 espera F3, F3 espera F4, F4 espera F0. Forma um ciclo fechado onde ninguém consegue avançar.
 
+Pseudocódigo:
+
+```
+para cada filosofo i:
+    pensar()
+    estado[i] = "com fome"
+    adquirir(garfo_esquerdo)   // bloqueia se ocupado
+    adquirir(garfo_direito)    // bloqueia se ocupado
+    estado[i] = "comendo"
+    comer()
+    liberar(garfo_direito)
+    liberar(garfo_esquerdo)
+    estado[i] = "pensando"
+```
+
 Print do terminal Travado:
 
 ![alt text](image.png)
 
+Como rodar:
+
+```
+python FilosofosVerIngenua.py
+```
