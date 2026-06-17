@@ -1,5 +1,6 @@
 Nome do grupo e dos integrantes:
 
+- Guilherme Camargo Rocha dos Santos
 - Joao Vitor Pereira da Silva
 
 Linguagem escolhida:
@@ -66,7 +67,7 @@ python "parte1-filósofos\FilosofosVerIngenua.py"
 ---------------------------------------------------------------------------------------------
 
 Parte 3 - Deadlock com Threads e Locks
-Responsavel: Joao Vitor Pereira da Silva
+Responsavel: Guilherme Camargo Rocha dos Santos
 
 Objetivo:
 
@@ -147,10 +148,10 @@ python "Parte 3\versao_com_deadlock.py"
 python "Parte 3\versao_corrigida.py"
 ```
 
-[!Print do terminal da versão que ocorre deadlock](Parte%203//log_deadlock.pngpng)
+[!Print do terminal da versão que ocorre deadlock](parte3/log_deadlock.pngpng)
 
 
-[!Print do Terminal da versão corrigida](Parte%203/log_corrigido.png.png)
+[!Print do Terminal da versão corrigida](parte3/log_corrigido.png.png)
 
 
 Conclusao:
