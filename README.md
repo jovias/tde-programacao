@@ -3,6 +3,7 @@ Nome do grupo e dos integrantes:
 - Joao Vitor Pereira da Silva
 - Matheus Pamplona Martins
 - Guilherme Camargo Rocha dos Santos
+- Mariana Mazur Lôr Dambrós
 
 Linguagem escolhida:
 
@@ -66,6 +67,64 @@ python "parte1-filósofos\FilosofosVerIngenua.py"
 ```
 
 ---------------------------------------------------------------------------------------------
+
+Parte 1 - Jantar dos Filosofos (Versao Corrigida)
+Responsavel: Mariana Mazur Lôr Dambrós
+
+Objetivo:
+
+- Fazer a implementacao do jantar dos filosofos usando threads com Python, agora sem deadlock.
+- SAplicar a estrategia de hierarquia de recursos para eliminar a espera circular.
+- Demonstrar que todos os filosofos conseguem comer e o programa termina corretamente.
+
+Implementacao:
+
+- Cada filosofo foi representado por uma thread.
+- Cada garfo foi representado por um `threading.Lock()`.
+- O ciclo de cada filosofo e: pensar, ficar com fome, tentar pegar os dois garfos na ordem correta, comer, liberar os garfos e voltar a pensar.
+- Em vez de sempre pegar o garfo esquerdo primeiro, cada filosofo calcula `primeiro = min(esq, dir)` e `segundo = max(esq, dir)`, garantindo que o garfo de menor indice seja sempre adquirido antes.
+- Foi usado `time.sleep(0.05)` entre os `acquire()` para manter o comportamento semelhante a versao ingenua e evidenciar que mesmo assim nao ocorre deadlock.
+
+Por que o deadlock não surge:
+
+- Todos os filosofos seguem a mesma ordem global de aquisicao: primeiro o garfo de menor indice, depois o de maior indice.
+- O filosofo F4, por exemplo, tem garfos 4 (esquerdo) e 0 (direito). Pela regra, ele precisa pegar o garfo 0 primeiro.
+- Isso faz com que F0 e F4 concorram pelo garfo 0. So um deles consegue, e o outro espera sem segurar nenhum recurso.
+- Sem ciclo de espera, o deadlock nao pode ocorrer.
+
+As 4 condicoes de Coffman:
+
+- Exclusao mutua: cada garfo so pode estar com um filosofo por vez. Isso e garantido pelo `threading.Lock()`.
+- Manter e esperar: o filosofo segura o garfo esquerdo enquanto espera o direito.
+- Nao preempcao: nenhum filosofo consegue tirar o garfo da mao de outro a forca. O garfo so e liberado com `release()`.
+- Espera circular: F0 espera F1, F1 espera F2, F2 espera F3, F3 espera F4 e F4 espera F0.
+
+Pseudocodigo:
+
+```text
+para cada filosofo i:
+    pensar()
+    estado[i] = "com fome"
+    adquirir(garfo_esquerdo)
+    adquirir(garfo_direito)
+    estado[i] = "comendo"
+    comer()
+    liberar(garfo_direito)
+    liberar(garfo_esquerdo)
+    estado[i] = "pensando"
+```
+
+Print do terminal travado:
+
+![Print da Parte 1](image.png)
+
+Como rodar:
+
+```powershell
+python "parte1-filósofos\FilosofosVerIngenua.py"
+```
+---------------------------------------------------------------------------------------------
+
 Parte 2 - Threads e Semaforos
 Responsavel: Matheus Pamplona Martins
 
