@@ -1,7 +1,8 @@
 Nome do grupo e dos integrantes:
 
-- Guilherme Camargo Rocha dos Santos
 - Joao Vitor Pereira da Silva
+- Matheus Pamplona Martins
+- Guilherme Camargo Rocha dos Santos
 
 Linguagem escolhida:
 
@@ -65,6 +66,105 @@ python "parte1-filósofos\FilosofosVerIngenua.py"
 ```
 
 ---------------------------------------------------------------------------------------------
+Parte 2 - Threads e Semaforos
+Responsavel: Matheus Pamplona Martins
+
+Objetivo:
+
+- Demonstrar uma condicao de corrida incrementando um contador compartilhado a partir de multiplas threads sem sincronizacao.
+- Corrigir o problema utilizando um semaforo binario.
+- Comparar o valor final e o tempo de execucao das duas versoes.
+
+Implementacao:
+
+- Um contador compartilhado `count` foi incrementado por `T = 8` threads, cada uma realizando `M = 200.000` incrementos.
+- A versao sem sincronizacao acessa o contador diretamente, sem nenhum controle de acesso.
+- A versao com semaforo utiliza `threading.Semaphore(1)` para garantir que apenas uma thread por vez execute o incremento.
+- O tempo de execucao de cada versao foi medido com `time.time()`.
+
+Por que a condicao de corrida surge:
+
+- A operacao `count = count + 1` e feita em etapas: ler o valor atual, somar 1 e salvar o resultado.
+- Quando duas threads leem o mesmo valor antes que qualquer uma salve, ambas calculam o mesmo resultado e uma das atualizacoes e sobrescrita.
+- Os incrementos se "atropelam" e o valor final acaba sendo menor do que o esperado.
+
+Por que a versao com semaforo e correta:
+
+- O semaforo binario garante que apenas uma thread por vez execute a secao critica.
+- Antes de incrementar, a thread chama `sem.acquire()`, que bloqueia caso outra thread ja esteja dentro da secao critica.
+- Ao terminar, chama `sem.release()`, liberando a passagem para a proxima.
+- Dessa forma, nenhum incremento e perdido, cada thread le o valor correto e atualizado do contador.
+
+Observacao sobre o GIL:
+
+- A condicao de corrida nao ficou evidente nos resultados porque o Python possui o GIL (Global Interpreter Lock), que impede que duas threads executem bytecode simultaneamente.
+- Em operacoes simples como o incremento de um inteiro, o GIL acaba protegendo o contador mesmo sem semaforo.
+- O proprio enunciado do trabalho alerta para essa caracteristica do Python e sugere operacoes suficientemente custosas para que a corrida seja visivel.
+
+Trade-off de throughput:
+
+- A correcao tem um custo: a versao com semaforo e significativamente mais lenta.
+- Isso acontece porque as threads deixam de trabalhar em paralelo na secao critica, passando a executar os incrementos de forma sequencial; cada uma esperando sua vez.
+- Quanto maior o numero de threads e incrementos, maior o tempo gasto em espera.
+
+Visibilidade e ordenacao (happens-before e barreiras implicitas):
+
+- Quando uma thread libera o semaforo com `sem.release()`, e garantido que todas as alteracoes que ela fez na memoria antes desse ponto sejam visiveis para a proxima thread que chamar `sem.acquire()`.
+- Esse conceito e chamado de happens-before: tudo que acontece antes do release e garantidamente visto apos o acquire.
+- Em Python, o semaforo funciona como uma barreira implicita de memoria, assegurando que o valor do contador lido por cada thread seja sempre o valor correto e atualizado.
+
+Pseudocodigo:
+
+```text
+Globais:
+    count = 0
+    sem = Semaforo(permissoes = 1)
+
+Funcao tarefa_sem_sync():
+    para i de 1 ate M:
+        count = count + 1
+
+Funcao tarefa_com_sync():
+    para i de 1 ate M:
+        sem.adquirir()
+        count = count + 1
+        sem.liberar()
+
+Programa principal:
+    iniciar T threads executando tarefa_sem_sync()
+    esperar todas terminarem
+    imprimir esperado = T*M, obtido = count, tempo = ...
+
+    iniciar T threads executando tarefa_com_sync()
+    esperar todas terminarem
+    imprimir esperado = T*M, obtido = count, tempo = ...
+```
+
+Tabela de resultados:
+
+| Execucao | Versao              | Esperado  | Obtido    | Tempo  |
+|----------|---------------------|-----------|-----------|--------|
+| 1        | Sem sincronizacao   | 1.600.000 | 1.600.000 | 0,25s  |
+| 1        | Com semaforo        | 1.600.000 | 1.600.000 | 2,72s  |
+| 2        | Sem sincronizacao   | 1.600.000 | 1.600.000 | 0,20s  |
+| 2        | Com semaforo        | 1.600.000 | 1.600.000 | 3,08s  |
+| 3        | Sem sincronizacao   | 1.600.000 | 1.600.000 | 0,18s  |
+| 3        | Com semaforo        | 1.600.000 | 1.600.000 | 2,88s  |
+
+Print do terminal:
+
+![Print do terminal - execucao 1](parte2/print1.png)
+![Print do terminal - execucao 2](parte2/print2.png)
+![Print do terminal - execucao 3](parte2/print3.png)
+
+Como rodar:
+
+```powershell
+python "Parte 2\contador_threads.py"
+```
+
+---------------------------------------------------------------------------------------------
+
 
 Parte 3 - Deadlock com Threads e Locks
 Responsavel: Guilherme Camargo Rocha dos Santos
