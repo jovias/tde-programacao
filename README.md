@@ -117,7 +117,7 @@ para cada filosofo i:
     estado[i] = "pensando"
 ```
 
-Print do terminal travado:
+Print do terminal:
 
 ![Print da Parte 1 Corrigida](parte1-filósofos/FilosofosVerCorrigida.png)
 
