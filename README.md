@@ -6,6 +6,9 @@ Linguagem escolhida:
 
 -Python
 
+
+---------------------------------------------------------------------------------------------
+
 Parte 1 — Jantar dos Filósofos (Versão Ingênua) Responsável: João Vitor Pereira da Silva
 
 Objetivo:
@@ -58,3 +61,5 @@ Como rodar:
 ```
 python FilosofosVerIngenua.py
 ```
+
+---------------------------------------------------------------------------------------------
