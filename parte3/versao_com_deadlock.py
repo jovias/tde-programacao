@@ -2,72 +2,54 @@ import threading
 import time
 
 
-# Dois locks representando dois recursos compartilhados.
 LOCK_A = threading.Lock()
 LOCK_B = threading.Lock()
 
-# A pausa ajuda as duas threads a pegarem o primeiro lock
-# antes de tentarem pegar o segundo.
-PAUSA_SEGUNDOS = 0.3
-
-
-def log(mensagem):
-    nome_thread = threading.current_thread().name
-    print(f"{nome_thread}: {mensagem}", flush=True)
-
 
 def tarefa_1():
-    log("tentando adquirir LOCK_A")
+    print("[Thread 1] tentando pegar LOCK_A")
     LOCK_A.acquire()
-    log("adquiriu LOCK_A")
+    print("[Thread 1] pegou LOCK_A")
 
-    time.sleep(PAUSA_SEGUNDOS)
+    time.sleep(0.3)
 
-    log("tentando adquirir LOCK_B")
-    LOCK_B.acquire()
+    print("[Thread 1] tentando pegar LOCK_B")
+    LOCK_B.acquire() #lock B ja esta foi adquirido pela thread 2, entao a thread 1 fica esperando para adquirir o lock B
 
-    # Em deadlock, normalmente o codigo abaixo nao executa.
-    log("adquiriu LOCK_B")
+    print("[Thread 1] terminou")
     LOCK_B.release()
     LOCK_A.release()
 
 
 def tarefa_2():
-    log("tentando adquirir LOCK_B")
+    print("[Thread 2] tentando pegar LOCK_B")
     LOCK_B.acquire()
-    log("adquiriu LOCK_B")
+    print("[Thread 2] pegou LOCK_B")
 
-    time.sleep(PAUSA_SEGUNDOS)
+    time.sleep(0.3)
 
-    log("tentando adquirir LOCK_A")
-    LOCK_A.acquire()
+    print("[Thread 2] tentando pegar LOCK_A")
+    LOCK_A.acquire()#lock A ja esta foi adquirido pela thread 1, entao a thread 2 fica esperando para adquirir o lock A
+    print("[Thread 2] pegou LOCK_A")
 
-    # Em deadlock, normalmente o codigo abaixo nao executa.
-    log("adquiriu LOCK_A")
+    print("[Thread 2] terminou")
     LOCK_A.release()
     LOCK_B.release()
 
 
 def main():
-    print("=== Versao com deadlock ===", flush=True)
+    print("\n--- Execucao da versao com deadlock ---")
 
-    # daemon=True permite que o programa encerre depois da deteccao,
-    # mesmo com as threads travadas esperando os locks.
-    thread_1 = threading.Thread(target=tarefa_1, name="Thread 1", daemon=True)
-    thread_2 = threading.Thread(target=tarefa_2, name="Thread 2", daemon=True)
+    t1 = threading.Thread(target=tarefa_1, name="T1-deadlock")
+    t2 = threading.Thread(target=tarefa_2, name="T2-deadlock")
 
-    thread_1.start()
-    thread_2.start()
+    t1.start()
+    t2.start()
 
-    thread_1.join(timeout=2)
-    thread_2.join(timeout=2)
+    t1.join()
+    t2.join()
 
-    if thread_1.is_alive() and thread_2.is_alive():
-        print()
-        print("Deadlock detectado.")
-        print("Thread 1 segura LOCK_A e espera LOCK_B.")
-        print("Thread 2 segura LOCK_B e espera LOCK_A.")
-        print("O programa nao consegue finalizar normalmente nessa situacao.")
+    print("Fim.")
 
 
 if __name__ == "__main__":

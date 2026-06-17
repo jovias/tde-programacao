@@ -66,98 +66,101 @@ python "parte1-filósofos\FilosofosVerIngenua.py"
 
 ---------------------------------------------------------------------------------------------
 
-Parte 3 - Deadlock com Threads e Locks
+Parte 3 - Deadlock com duas threads
 Responsavel: Guilherme Camargo Rocha dos Santos
 
 Objetivo:
 
-- Demonstrar, de forma pratica, como um deadlock acontece em um programa concorrente.
-- Criar uma versao com deadlock usando duas threads e dois locks.
-- Criar uma versao corrigida usando hierarquia de recursos, tambem chamada de ordem global de aquisicao.
-- Relacionar o problema com as quatro condicoes de Coffman.
+- Fazer um exemplo simples de deadlock usando threads em Python.
+- Usar dois locks, chamados `LOCK_A` e `LOCK_B`.
+- Mostrar uma versao que trava e uma versao corrigida.
 
 Implementacao da versao com deadlock:
 
-- Foram criados dois locks: `LOCK_A` e `LOCK_B`.
-- A `Thread 1` tenta adquirir primeiro o `LOCK_A` e depois o `LOCK_B`.
-- A `Thread 2` tenta adquirir primeiro o `LOCK_B` e depois o `LOCK_A`.
-- Foi usado `time.sleep(PAUSA_SEGUNDOS)` entre a primeira e a segunda tentativa de aquisicao.
-- Os logs mostram quando cada thread tenta adquirir e quando consegue adquirir cada lock.
+- Foram criadas duas threads.
+- A Thread 1 pega primeiro o `LOCK_A` e depois tenta pegar o `LOCK_B`.
+- A Thread 2 pega primeiro o `LOCK_B` e depois tenta pegar o `LOCK_A`.
+- Tem um `time.sleep(0.3)` entre os dois `acquire()`, para dar tempo das duas threads pegarem o primeiro lock.
+- Depois disso, cada uma fica esperando o lock que esta com a outra.
 
-Por que o deadlock surge:
+Por que trava:
 
-- A `Thread 1` segura o `LOCK_A` e fica esperando o `LOCK_B`.
-- A `Thread 2` segura o `LOCK_B` e fica esperando o `LOCK_A`.
-- Nenhuma das duas consegue continuar, porque cada uma espera um recurso que esta preso com a outra.
+- A Thread 1 fica segurando o `LOCK_A` e esperando o `LOCK_B`.
+- A Thread 2 fica segurando o `LOCK_B` e esperando o `LOCK_A`.
+- Como nenhuma libera o lock que ja pegou, o programa fica parado e nao chega no `Fim`.
 
-Implementacao da versao corrigida:
-
-- As duas threads seguem a mesma ordem de aquisicao dos locks.
-- A regra usada foi: sempre adquirir `LOCK_A` antes de `LOCK_B`.
-- A liberacao dos locks acontece automaticamente com `with LOCK_A` e `with LOCK_B`.
-- Como todas as threads seguem a mesma ordem, a espera circular deixa de existir.
-
-As 4 condicoes de Coffman na Parte 3:
+As 4 condicoes de Coffman:
 
 - Exclusao mutua: cada lock so pode estar com uma thread por vez.
-- Manter e esperar: na versao com deadlock, uma thread segura um lock enquanto espera o outro.
-- Nao preempcao: uma thread nao consegue forcar a outra a liberar um lock.
-- Espera circular: a `Thread 1` espera a `Thread 2`, e a `Thread 2` espera a `Thread 1`.
+- Manter e esperar: cada thread segura um lock enquanto espera o outro.
+- Nao preempcao: uma thread nao consegue forcar a outra a liberar o lock.
+- Espera circular: a Thread 1 espera a Thread 2, e a Thread 2 espera a Thread 1.
 
-Condicao quebrada na correcao:
+Versao corrigida:
 
-- A correcao quebra a espera circular.
-- Quando todas as threads seguem a ordem `LOCK_A -> LOCK_B`, nao existe mais ciclo de espera.
+- Na versao corrigida, as duas threads seguem a mesma ordem.
+- As duas pegam primeiro o `LOCK_A` e depois o `LOCK_B`.
+- Assim uma thread pode esperar, mas nao fica segurando `LOCK_B` enquanto espera `LOCK_A`.
+- A condicao quebrada foi a espera circular.
 
 Pseudocodigo da versao com deadlock:
 
 ```text
 Thread 1:
-    adquirir(LOCK_A)
-    esperar()
-    adquirir(LOCK_B)
+    pega LOCK_A
+    espera um pouco
+    tenta pegar LOCK_B
 
 Thread 2:
-    adquirir(LOCK_B)
-    esperar()
-    adquirir(LOCK_A)
+    pega LOCK_B
+    espera um pouco
+    tenta pegar LOCK_A
 ```
 
 Pseudocodigo da versao corrigida:
 
 ```text
 Thread 1:
-    adquirir(LOCK_A)
-    adquirir(LOCK_B)
-    executar_secao_critica()
-    liberar(LOCK_B)
-    liberar(LOCK_A)
+    pega LOCK_A
+    pega LOCK_B
+    libera LOCK_B
+    libera LOCK_A
 
 Thread 2:
-    adquirir(LOCK_A)
-    adquirir(LOCK_B)
-    executar_secao_critica()
-    liberar(LOCK_B)
-    liberar(LOCK_A)
+    pega LOCK_A
+    pega LOCK_B
+    libera LOCK_B
+    libera LOCK_A
 ```
 
 Como rodar:
 
 ```powershell
-python "Parte 3\versao_com_deadlock.py"
-python "Parte 3\versao_corrigida.py"
+python "parte3\versao_com_deadlock.py"
+python "parte3\versao_corrigida.py"
 ```
 
-![Print do terminal da versão que ocorre deadlock](parte3/log_deadlock.png)
+Na versao com deadlock, o terminal vai ficar parado. Para sair, use `Ctrl + C`.
 
+Print da versao com deadlock:
 
-![Print do Terminal da versão corrigida](parte3/log_corrigido.png)
+![Print do terminal da versao que ocorre deadlock](parte3/log_deadlock.png)
 
+Print da versao corrigida:
+
+![Print do terminal da versao corrigida](parte3/log_corrigido.png)
+
+Prints necessarios para a atividade:
+
+- Print da versao com deadlock mostrando a Thread 1 pegando `LOCK_A`.
+- Print da versao com deadlock mostrando a Thread 2 pegando `LOCK_B`.
+- Print da versao com deadlock mostrando a Thread 1 tentando pegar `LOCK_B` e a Thread 2 tentando pegar `LOCK_A`.
+- Print do terminal parado, mostrando que a versao com deadlock nao finaliza.
+- Print da versao corrigida mostrando que as duas threads terminaram sem deadlock.
 
 Conclusao:
 
-- A versao com deadlock trava porque as threads usam ordem oposta de aquisicao dos locks.
-- A versao corrigida termina normalmente porque todas as threads seguem a mesma ordem de aquisicao.
-- A estrategia usada na correcao foi a hierarquia de recursos.
+- A primeira versao trava porque as threads pegam os locks em ordem contraria.
+- A segunda versao funciona porque as duas seguem a mesma ordem: `LOCK_A` e depois `LOCK_B`.
 
 ---------------------------------------------------------------------------------------------

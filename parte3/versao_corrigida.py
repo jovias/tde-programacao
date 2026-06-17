@@ -2,53 +2,46 @@ import threading
 import time
 
 
-# Dois locks representando dois recursos compartilhados.
 LOCK_A = threading.Lock()
 LOCK_B = threading.Lock()
 
-PAUSA_SEGUNDOS = 0.3
 
+def tarefa(nome):
+    print("[" + nome + "] tentando pegar LOCK_A")
+    LOCK_A.acquire()
+    print("[" + nome + "] pegou LOCK_A")
 
-def log(mensagem):
-    nome_thread = threading.current_thread().name
-    print(f"{nome_thread}: {mensagem}", flush=True)
+    time.sleep(0.3)
 
+    print("[" + nome + "] tentando pegar LOCK_B")
+    LOCK_B.acquire()
+    print("[" + nome + "] pegou LOCK_B")
 
-def tarefa():
-    # Correcao: todas as threads pegam os locks na mesma ordem.
-    # Isso impede a espera circular.
-    log("tentando adquirir LOCK_A")
-    with LOCK_A:
-        log("adquiriu LOCK_A")
+    print("[" + nome + "] executando secao critica")
+    time.sleep(0.2)
 
-        time.sleep(PAUSA_SEGUNDOS)
+    LOCK_B.release()
+    print("[" + nome + "] liberou LOCK_B")
 
-        log("tentando adquirir LOCK_B")
-        with LOCK_B:
-            log("adquiriu LOCK_B")
-            log("executando secao critica")
-            time.sleep(PAUSA_SEGUNDOS)
+    LOCK_A.release()
+    print("[" + nome + "] liberou LOCK_A")
 
-        log("liberou LOCK_B")
-
-    log("liberou LOCK_A")
-    log("finalizou normalmente")
+    print("[" + nome + "] terminou")
 
 
 def main():
-    print("=== Versao corrigida ===", flush=True)
+    print("\n--- Execucao da versao corrigida ---")
 
-    thread_1 = threading.Thread(target=tarefa, name="Thread 1")
-    thread_2 = threading.Thread(target=tarefa, name="Thread 2")
+    t1 = threading.Thread(target=tarefa, args=("Thread 1",), name="T1-corrigida")
+    t2 = threading.Thread(target=tarefa, args=("Thread 2",), name="T2-corrigida")
 
-    thread_1.start()
-    thread_2.start()
+    t1.start()
+    t2.start()
 
-    thread_1.join()
-    thread_2.join()
+    t1.join()
+    t2.join()
 
-    print()
-    print("As duas threads terminaram sem deadlock.")
+    print("Todos terminaram sem deadlock.")
 
 
 if __name__ == "__main__":
