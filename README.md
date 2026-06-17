@@ -77,14 +77,14 @@ Objetivo:
 
 Implementacao:
 
-- Um contador compartilhado `count` foi incrementado por `T = 8` threads, cada uma realizando `M = 200.000` incrementos.
+- Um contador compartilhado `contador` foi incrementado por `NUM_THREADS = 8` threads, cada uma realizando `NUM_ITERACOES = 200.000` incrementos.
 - A versao sem sincronizacao acessa o contador diretamente, sem nenhum controle de acesso.
 - A versao com semaforo utiliza `threading.Semaphore(1)` para garantir que apenas uma thread por vez execute o incremento.
 - O tempo de execucao de cada versao foi medido com `time.time()`.
 
 Por que a condicao de corrida surge:
 
-- A operacao `count = count + 1` e feita em etapas: ler o valor atual, somar 1 e salvar o resultado.
+- A operacao `contador = contador + 1` e feita em etapas: ler o valor atual, somar 1 e salvar o resultado.
 - Quando duas threads leem o mesmo valor antes que qualquer uma salve, ambas calculam o mesmo resultado e uma das atualizacoes e sobrescrita.
 - Os incrementos se "atropelam" e o valor final acaba sendo menor do que o esperado.
 
@@ -117,27 +117,27 @@ Pseudocodigo:
 
 ```text
 Globais:
-    count = 0
+    contador = 0
     sem = Semaforo(permissoes = 1)
 
-Funcao tarefa_sem_sync():
-    para i de 1 ate M:
-        count = count + 1
+Funcao tarefa_sem_sincronizacao():
+    para i de 1 ate NUM_ITERACOES:
+        contador = contador + 1
 
-Funcao tarefa_com_sync():
-    para i de 1 ate M:
+Funcao tarefa_com_sincronizacao():
+    para i de 1 ate NUM_ITERACOES:
         sem.adquirir()
-        count = count + 1
+        contador = contador + 1
         sem.liberar()
 
 Programa principal:
-    iniciar T threads executando tarefa_sem_sync()
+    iniciar NUM_THREADS threads executando tarefa_sem_sincronizacao()
     esperar todas terminarem
-    imprimir esperado = T*M, obtido = count, tempo = ...
+    imprimir esperado = NUM_THREADS*NUM_ITERACOES, obtido = contador, tempo = ...
 
-    iniciar T threads executando tarefa_com_sync()
+    iniciar NUM_THREADS threads executando tarefa_com_sincronizacao()
     esperar todas terminarem
-    imprimir esperado = T*M, obtido = count, tempo = ...
+    imprimir esperado = NUM_THREADS*NUM_ITERACOES, obtido = contador, tempo = ...
 ```
 
 Tabela de resultados:
@@ -162,7 +162,6 @@ Como rodar:
 ```powershell
 python "Parte 2\contador_threads.py"
 ```
-
 ---------------------------------------------------------------------------------------------
 
 
