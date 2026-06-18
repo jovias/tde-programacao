@@ -5,6 +5,9 @@ Nome do grupo e dos integrantes:
 - Guilherme Camargo Rocha dos Santos
 - Mariana Mazur Lôr Dambrós
 
+Link do vídeo do Youtube:
+https://youtu.be/5LficSzMYSI?is=C4hPeJ4PaXPcmJOL
+
 Linguagem escolhida:
 
 - Python
